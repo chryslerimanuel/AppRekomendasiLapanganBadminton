@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".DetailActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_detFotoLap"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_marginBottom="20dp"
+            tools:srcCompat="@tools:sample/avatars"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+
+        <TextView
+            android:id="@+id/tv_detNamaLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iv_detFotoLap"
+            android:gravity="center"
+            android:maxLines="2"
+            android:text="Nama Lapangan"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detJarakLap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detNamaLap"
+            android:gravity="center"
+            android:text="Jarak"
+            android:layout_marginLeft="150dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:maxLength="4"/>
+
+        <TextView
+            android:id="@+id/tv_km"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detNamaLap"
+            android:layout_toEndOf="@+id/tv_detJarakLap"
+            android:layout_marginLeft="5dp"
+            android:text="km"
+            android:textSize="14sp"
+            />
+
+        <Button
+            android:id="@+id/btn_gmaps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_km"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="Open Google Maps"
+            android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+            android:textColor="@color/cardview_light_background"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:background="@drawable/button_background"/>
+
+        <TextView
+            android:id="@+id/tv_judulAlamat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_gmaps"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="12dp"
+            android:text="Alamat"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detAlamatLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulAlamat"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:text="Alamat Lapangan"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_judulHarga"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detAlamatLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:text="Harga"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detHargaLap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulHarga"
+            android:layout_toEndOf="@+id/tv_rp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="3dp"
+            android:text="Harga Lapangan"
+            android:textSize="14sp"
+            android:maxLength="5"/>
+
+        <TextView
+            android:id="@+id/tv_rp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulHarga"
+            android:layout_marginLeft="5dp"
+            android:text="Rp"
+            android:textSize="14sp"
+            android:layout_marginTop="3sp"
+            android:layout_marginStart="10dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_judulHari"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detHargaLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:text="Hari Buka"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detHariLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulHari"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:text="Hari Buka Lapangan"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_judulFasilitas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detHariLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:text="Fasilitas"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detFasilitasLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulFasilitas"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:text="Fasilitas Lapangan"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_judulJumlah"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detFasilitasLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:text="Jumlah Lapangan"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detJumlahLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulJumlah"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:text="Jumlah Lapangan"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tv_judulPenonton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_detJumlahLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
+            android:text="Kapasitas Penonton"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_detPenontonLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_judulPenonton"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:text="Kapasitas Penonton"
+            android:textSize="14sp" />
+
+
+
+    </RelativeLayout>
+
+</ScrollView>

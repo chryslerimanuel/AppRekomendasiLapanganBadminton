@@ -1,0 +1,1328 @@
+package com.example.ramz.constraintlayouttest.StudentPage.constraintlayouttest.MainPage;
+
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.ramz.constraintlayouttest.R;
+import com.example.ramz.constraintlayouttest.StudentPage.constraintlayouttest.FrontPage.FirstTimeAppOpenedPage;
+import com.example.ramz.constraintlayouttest.StudentPage.constraintlayouttest.HitungTopsis.HitungTopsisClass;
+import com.example.ramz.constraintlayouttest.StudentPage.constraintlayouttest.Model.TopsisModel;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
+public class RecomendationPage extends AppCompatActivity {
+
+    //System.out.println(pembagi_jarak+"\n"+pembagi_harga+"\n"+pembagi_suasana+"\n"+pembagi_fasilitas+"\n"+pembagi_rating);
+
+    ProgressDialog progressDialog;
+
+    SeekBar seekBar_harga, seekBar_jarak, seekBar_fasilitas,
+            seekBar_suasana, seekBar_rating;
+
+    TextView tv_seekbar_harga, tv_seekbar_jarak, tv_seekbar_fasilitas,
+                tv_seekbar_suasana, tv_seekbar_rating, tv_pengguna;
+
+    int bobot_harga, bobot_jarak, bobot_fasilitas,
+            bobot_suasana, bobot_rating;
+
+    double latitude, longitude;
+
+    String string_latitude, string_longitude;
+
+    String url_cafedata;
+
+    Button submit_topsis, yes_cancel_recomm,no_cancel_recomm;
+
+    double jarak_double;
+
+    private ArrayList<TopsisModel> Topsisitem,
+                                    tobesorted;
+
+    //Array normalisasi
+    private ArrayList<Double> Harga_Normalisasi,
+            Jarak_Normalisasi,
+            Fasilitas_Normalisasi,
+            Suasana_Normalisasi,
+            Rating_Normalisasi;
+
+    //Array Normalisasi terbobot
+    ArrayList<Double> Jarak_normalisasi_terbobot,
+            Harga_normalisasi_terbobot,
+            Suasana_normalisasi_terbobot,
+            Fasilitas_normalisasi_terbobot,
+            Rating_normalisasi_terbobot;
+
+    //reverse arraylist to get borda
+    ArrayList<TopsisModel> borda;
+
+    //A+
+    double JarakPositif ,
+            HargaPositif ,
+            SuasanaPositif,
+            FasilitasPostif,
+            RatingPositif;
+
+    //A-
+    double JarakNegatif,
+            HargaNegatif ,
+            SuasanaNegatif,
+            FasilitasNegatif,
+            RatingNegatif;
+
+    //Si+, Si-, Jumlah Si
+    ArrayList<Double> SiPositif,
+            SiNegatif,
+            JumlahSi;
+
+    //Ci+
+    ArrayList<Double> CiPositif;
+
+    double pembagi_harga, pembagi_jarak, pembagi_fasilitas,
+            pembagi_rating, pembagi_suasana;
+
+    //Ambil Rumus
+    HitungTopsisClass hitungTopsisClass;
+
+    //jumlah user
+    int counter = 0,
+        jumlahuser;
+
+    //bobot yg telah di nomalisasi
+    double bobot_normalisasi_jarak,
+            bobot_normalisasi_harga,
+            bobot_normalisasi_fasilitas,
+            bobot_normalisasi_suasana,
+            bobot_normalisasi_rating;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_single_recomendation_page);
+
+        borda = new ArrayList<>();
+
+        progressDialog = new ProgressDialog(RecomendationPage.this);
+
+        tv_pengguna = findViewById(R.id.tv_pengguna);
+
+        //list normalisasi
+        Harga_Normalisasi = new ArrayList<>();
+        Jarak_Normalisasi = new ArrayList<>();
+        Rating_Normalisasi = new ArrayList<>();
+        Suasana_Normalisasi = new ArrayList<>();
+        Fasilitas_Normalisasi = new ArrayList<>();
+
+        //list normalisasi terbobot
+        Jarak_normalisasi_terbobot = new ArrayList<>();
+        Harga_normalisasi_terbobot = new ArrayList<>();
+        Suasana_normalisasi_terbobot = new ArrayList<>();
+        Fasilitas_normalisasi_terbobot = new ArrayList<>();
+        Rating_normalisasi_terbobot = new ArrayList<>();
+
+        //si+ si- jumlh si
+        SiPositif = new ArrayList<>();
+        SiNegatif = new ArrayList<>();
+        JumlahSi = new ArrayList<>();
+
+        //Ci+
+        CiPositif = new ArrayList<>();
+
+        //call rumus class
+        hitungTopsisClass = new HitungTopsisClass();
+
+
+        //call arraylist
+        Topsisitem = new ArrayList<>();
+        tobesorted = new ArrayList<>();
+
+        //url cafe
+        url_cafedata = getString(R.string.baseurlink)+"getcafedata.php";
+
+        //get data
+        getcafedatafortopsis();
+
+        //get lat & long
+        Intent intent = getIntent();
+        latitude = intent.getDoubleExtra("latitude_user",0);
+        longitude = intent.getDoubleExtra("longitude_user",0);
+        jumlahuser = intent.getIntExtra("user_number",1);
+        Log.i("lat&long", "onCreate: " + latitude +"        "+longitude+"          "+jumlahuser);
+
+        string_latitude = String.valueOf(latitude);
+        string_longitude = String.valueOf(longitude);
+
+
+        //seekbar init
+        seekBar_jarak = findViewById(R.id.seekBarJarak);
+        seekBar_harga = findViewById(R.id.seekBarHarga);
+        seekBar_fasilitas = findViewById(R.id.seekBarFasilitas);
+        seekBar_suasana = findViewById(R.id.seekBarSuasana);
+        seekBar_rating = findViewById(R.id.seekBarRating);
+        seekBar_jarak.setMax(10);
+        seekBar_harga.setMax(10);
+        seekBar_fasilitas.setMax(10);
+        seekBar_suasana.setMax(10);
+        seekBar_rating.setMax(10);
+
+
+
+        //tv_seekbar
+        tv_seekbar_jarak = findViewById(R.id.tv_nilai_seekbar_jarak);
+        tv_seekbar_harga = findViewById(R.id.tv_nilai_seekbar_harga);
+        tv_seekbar_fasilitas = findViewById(R.id.tv_nilai_seekbar_fasilitas);
+        tv_seekbar_suasana = findViewById(R.id.tv_nilai_seekbar_suasana);
+        tv_seekbar_rating = findViewById(R.id.tv_nilai_seekbar_rating);
+
+        //init button
+        submit_topsis = findViewById(R.id.bt_submit_seekbar_value);
+
+
+        seekBar_jarak.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                bobot_jarak = seekBar.getProgress();
+                tv_seekbar_jarak.setText(String.valueOf(bobot_jarak));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBar_harga.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                bobot_harga = seekBar.getProgress();
+                tv_seekbar_harga.setText(String.valueOf(bobot_harga));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBar_fasilitas.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                bobot_fasilitas = seekBar.getProgress();
+                tv_seekbar_fasilitas.setText(String.valueOf(bobot_fasilitas));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        seekBar_suasana.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                bobot_suasana = seekBar.getProgress();
+                tv_seekbar_suasana.setText(String.valueOf(bobot_suasana));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBar_rating.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+                bobot_rating = seekBar.getProgress();
+                tv_seekbar_rating.setText(String.valueOf(bobot_rating));
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+        submit_topsis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (bobot_jarak == 0){
+
+                    Toast.makeText(getApplicationContext(), "jarak tidak boleh bernilai 0",Toast.LENGTH_SHORT).show();
+
+                }else if (bobot_harga == 0){
+
+                    Toast.makeText(getApplicationContext(), "harga tidak boleh bernilai 0",Toast.LENGTH_SHORT).show();
+
+                }else if (bobot_fasilitas == 0){
+
+                    Toast.makeText(getApplicationContext(), "fasilitas tidak boleh bernilai 0",Toast.LENGTH_SHORT).show();
+
+                }else if (bobot_suasana ==0){
+
+                    Toast.makeText(getApplicationContext(), "suasana tidak boleh bernilai 0",Toast.LENGTH_SHORT).show();
+
+                }else if (bobot_rating ==0){
+
+                    Toast.makeText(getApplicationContext(), "rating tidak boleh bernilai 0",Toast.LENGTH_SHORT).show();
+
+                }else{
+
+                    counter++;
+
+                    bobot_normalisasi_jarak = ((double) bobot_jarak)/(((double)bobot_jarak)+((double)bobot_harga)+((double)bobot_fasilitas)+((double)bobot_suasana)+ ((double)bobot_rating));
+                    bobot_normalisasi_harga = ((double)bobot_harga)/(((double)bobot_jarak)+((double)bobot_harga)+((double)bobot_fasilitas)+((double)bobot_suasana)+ ((double)bobot_rating));
+                    bobot_normalisasi_fasilitas =((double)bobot_fasilitas)/(((double)bobot_jarak)+((double)bobot_harga)+((double)bobot_fasilitas)+((double)bobot_suasana)+ ((double)bobot_rating));
+                    bobot_normalisasi_suasana = ((double)bobot_suasana)/(((double)bobot_jarak)+((double)bobot_harga)+((double)bobot_fasilitas)+((double)bobot_suasana)+ ((double)bobot_rating));
+                    bobot_normalisasi_rating = ((double)bobot_rating)/(((double)bobot_jarak)+((double)bobot_harga)+((double)bobot_fasilitas)+((double)bobot_suasana)+ ((double)bobot_rating));
+
+                    if (jumlahuser == 1){
+
+                        TopsisCalculation();
+                        MergeCafeDataWithTopsisForOneUserOnly(CiPositif);
+
+
+                    }else if (counter == 1){
+
+
+                        TopsisCalculation();
+                        MergeCafeDataWithTopsisValueFirstUser(CiPositif);
+
+
+                    }else if(counter >=1 && counter < jumlahuser){
+
+                        TopsisCalculation();
+                        MergeCafeDataWithTopsisValueNextUser(CiPositif);
+
+
+
+                    }else if (counter == jumlahuser){
+
+                        TopsisCalculation();
+                        MergeCafeDataWithTopsisValueLastUser(CiPositif);
+                    }
+
+                }
+
+            }
+        });
+
+
+
+    }
+
+
+    private void MergeCafeDataWithTopsisForOneUserOnly(final ArrayList<Double> Ci) {
+
+        progressDialog.setTitle("Proccessing");
+        progressDialog.setMessage("Loading.....Please Wait");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_cafedata, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject Response = new JSONObject(response);
+
+                    JSONObject Data = new JSONObject(Response.getString("Data"));
+
+                    JSONArray data_cafe_array = Data.getJSONArray("data_cafe");
+
+                    for (int i = 0; i < data_cafe_array.length(); i++) {
+                        //get all cafe data
+                        JSONObject data_cafe_obj = data_cafe_array.getJSONObject(i);
+
+                        double cipositif = Ci.get(i);
+
+                        String id_cafe = data_cafe_obj.getString("id_cafe");
+
+                        String nama_cafe = data_cafe_obj.getString("nama_cafe");
+
+                        String alamat_cafe = data_cafe_obj.getString("alamat_cafe");
+
+                        String harga_cafe = data_cafe_obj.getString("harga_cafe");
+
+                        String suasana_cafe = data_cafe_obj.getString("suasana_cafe");
+
+                        String fasilitas_cafe = data_cafe_obj.getString("fasilitas_cafe");
+
+                        String rating_cafe = data_cafe_obj.getString("rating_cafe");
+
+                        String jam_operasional_cafe = data_cafe_obj.getString("jam_operasional_cafe");
+
+                        String latitude_cafe = data_cafe_obj.getString("latitude_cafe");
+
+                        String longitude_cafe = data_cafe_obj.getString("longitude_cafe");
+
+                        String gambar_cafe = data_cafe_obj.getString("gambar_cafe");
+
+                        //convert string harga, jarak, rating, fasilitas, suasana to double
+                        String jarak = hitungjaraktest(latitude_cafe,longitude_cafe, string_latitude,string_longitude);
+                        jarak_double = Double.valueOf(jarak);
+                        double harga_double = Double.valueOf(harga_cafe);
+                        double suasana_double = Double.valueOf(suasana_cafe);
+                        double fasilitas_double = Double.valueOf(fasilitas_cafe);
+                        double rating_double = Double.valueOf(rating_cafe);
+
+                        //insert to array
+                        tobesorted.add(new TopsisModel(jarak_double, harga_double, suasana_double, fasilitas_double, rating_double, cipositif,Integer.valueOf(id_cafe), nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+                        Log.i("TobesortedArray", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                                "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                                "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                                "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                                "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                                "\nNilai Ci+: " + tobesorted.get(i).getTopsisborda() );
+
+                    }
+
+                    FirstUserOnlySortAndDoBorda(tobesorted);
+                    SendFinalArraylistToNextAct(tobesorted);
+                    progressDialog.dismiss();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                    startActivity(intent);
+                    finish();
+
+
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(RecomendationPage.this);
+        requestQueue.add(stringRequest);
+    }
+
+
+    private void MergeCafeDataWithTopsisValueFirstUser(final ArrayList<Double> Ci) {
+
+        progressDialog.setTitle("Proccessing");
+        progressDialog.setMessage("Loading.....Please Wait");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_cafedata, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject Response = new JSONObject(response);
+
+                    JSONObject Data = new JSONObject(Response.getString("Data"));
+
+                    JSONArray data_cafe_array = Data.getJSONArray("data_cafe");
+
+                    for (int i = 0; i < data_cafe_array.length(); i++) {
+                        //get all cafe data
+                        JSONObject data_cafe_obj = data_cafe_array.getJSONObject(i);
+
+                        double cipositif = Ci.get(i);
+
+                        String id_cafe = data_cafe_obj.getString("id_cafe");
+
+                        String nama_cafe = data_cafe_obj.getString("nama_cafe");
+
+                        String alamat_cafe = data_cafe_obj.getString("alamat_cafe");
+
+                        String harga_cafe = data_cafe_obj.getString("harga_cafe");
+
+                        String suasana_cafe = data_cafe_obj.getString("suasana_cafe");
+
+                        String fasilitas_cafe = data_cafe_obj.getString("fasilitas_cafe");
+
+                        String rating_cafe = data_cafe_obj.getString("rating_cafe");
+
+                        String jam_operasional_cafe = data_cafe_obj.getString("jam_operasional_cafe");
+
+                        String latitude_cafe = data_cafe_obj.getString("latitude_cafe");
+
+                        String longitude_cafe = data_cafe_obj.getString("longitude_cafe");
+
+                        String gambar_cafe = data_cafe_obj.getString("gambar_cafe");
+
+                        //convert string harga, jarak, rating, fasilitas, suasana to double
+                        String jarak = hitungjaraktest(latitude_cafe,longitude_cafe, string_latitude,string_longitude);
+                        jarak_double = Double.valueOf(jarak);
+                        double harga_double = Double.valueOf(harga_cafe);
+                        double suasana_double = Double.valueOf(suasana_cafe);
+                        double fasilitas_double = Double.valueOf(fasilitas_cafe);
+                        double rating_double = Double.valueOf(rating_cafe);
+
+                        //insert to array
+                        tobesorted.add(new TopsisModel(jarak_double, harga_double, suasana_double, fasilitas_double, rating_double, cipositif,Integer.valueOf(id_cafe), nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+                        Log.i("TobesortedArray", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                                        "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                                        "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                                         "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                                         "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                                         "\nNilai Ci+: " + tobesorted.get(i).getTopsisborda() );
+
+                    }
+
+                    FirstUserSortAndDoBorda(tobesorted);
+                    ClearArrayForNextUser();
+                    tv_pengguna.setText("Pengguna "+ String.valueOf(counter + 1));
+                    progressDialog.dismiss();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                    startActivity(intent);
+                    finish();
+
+
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(RecomendationPage.this);
+        requestQueue.add(stringRequest);
+    }
+
+    //for next user after the first user and before the last user
+    private void MergeCafeDataWithTopsisValueNextUser(final ArrayList<Double> Ci) {
+
+        progressDialog.setTitle("Proccessing");
+        progressDialog.setMessage("Loading.....Please Wait");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_cafedata, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject Response = new JSONObject(response);
+
+                    JSONObject Data = new JSONObject(Response.getString("Data"));
+
+                    JSONArray data_cafe_array = Data.getJSONArray("data_cafe");
+
+                    for (int i = 0; i < data_cafe_array.length(); i++) {
+                        //get all cafe data
+                        JSONObject data_cafe_obj = data_cafe_array.getJSONObject(i);
+
+                        double cipositif = Ci.get(i);
+
+                        String id_cafe = data_cafe_obj.getString("id_cafe");
+
+                        String nama_cafe = data_cafe_obj.getString("nama_cafe");
+
+                        String alamat_cafe = data_cafe_obj.getString("alamat_cafe");
+
+                        String harga_cafe = data_cafe_obj.getString("harga_cafe");
+
+                        String suasana_cafe = data_cafe_obj.getString("suasana_cafe");
+
+                        String fasilitas_cafe = data_cafe_obj.getString("fasilitas_cafe");
+
+                        String rating_cafe = data_cafe_obj.getString("rating_cafe");
+
+                        String jam_operasional_cafe = data_cafe_obj.getString("jam_operasional_cafe");
+
+                        String latitude_cafe = data_cafe_obj.getString("latitude_cafe");
+
+                        String longitude_cafe = data_cafe_obj.getString("longitude_cafe");
+
+                        String gambar_cafe = data_cafe_obj.getString("gambar_cafe");
+
+                        //convert string harga, jarak, rating, fasilitas, suasana to double
+                        String jarak = hitungjaraktest(latitude_cafe,longitude_cafe, string_latitude,string_longitude);
+                        jarak_double = Double.valueOf(jarak);
+                        double harga_double = Double.valueOf(harga_cafe);
+                        double suasana_double = Double.valueOf(suasana_cafe);
+                        double fasilitas_double = Double.valueOf(fasilitas_cafe);
+                        double rating_double = Double.valueOf(rating_cafe);
+
+                        //insert to array
+                        tobesorted.add(new TopsisModel(jarak_double, harga_double, suasana_double, fasilitas_double, rating_double, cipositif,Integer.valueOf(id_cafe), nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+                        Log.i("TobesortedArray", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                                "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                                "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                                "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                                "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                                "\nNilai Ci+: " + tobesorted.get(i).getTopsisborda() );
+
+                    }
+
+                    NextUserSortAndDoBorda(tobesorted);
+                    ClearArrayForNextUser();
+                    tv_pengguna.setText("Pengguna "+ String.valueOf(counter + 1));
+                    progressDialog.dismiss();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                    startActivity(intent);
+                    finish();
+
+
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                        startActivity(intent);
+                        finish();
+
+
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(RecomendationPage.this);
+        requestQueue.add(stringRequest);
+    }
+
+    //for the last user
+    private void MergeCafeDataWithTopsisValueLastUser(final ArrayList<Double> Ci) {
+
+        progressDialog.setTitle("Proccessing");
+        progressDialog.setMessage("Loading.....Please Wait");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_cafedata, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject Response = new JSONObject(response);
+
+                    JSONObject Data = new JSONObject(Response.getString("Data"));
+
+                    JSONArray data_cafe_array = Data.getJSONArray("data_cafe");
+
+                    for (int i = 0; i < data_cafe_array.length(); i++) {
+                        //get all cafe data
+                        JSONObject data_cafe_obj = data_cafe_array.getJSONObject(i);
+
+                        double cipositif = Ci.get(i);
+
+                        String id_cafe = data_cafe_obj.getString("id_cafe");
+
+                        String nama_cafe = data_cafe_obj.getString("nama_cafe");
+
+                        String alamat_cafe = data_cafe_obj.getString("alamat_cafe");
+
+                        String harga_cafe = data_cafe_obj.getString("harga_cafe");
+
+                        String suasana_cafe = data_cafe_obj.getString("suasana_cafe");
+
+                        String fasilitas_cafe = data_cafe_obj.getString("fasilitas_cafe");
+
+                        String rating_cafe = data_cafe_obj.getString("rating_cafe");
+
+                        String jam_operasional_cafe = data_cafe_obj.getString("jam_operasional_cafe");
+
+                        String latitude_cafe = data_cafe_obj.getString("latitude_cafe");
+
+                        String longitude_cafe = data_cafe_obj.getString("longitude_cafe");
+
+                        String gambar_cafe = data_cafe_obj.getString("gambar_cafe");
+
+                        //convert string harga, jarak, rating, fasilitas, suasana to double
+                        String jarak = hitungjaraktest(latitude_cafe,longitude_cafe, string_latitude,string_longitude);
+                        jarak_double = Double.valueOf(jarak);
+                        double harga_double = Double.valueOf(harga_cafe);
+                        double suasana_double = Double.valueOf(suasana_cafe);
+                        double fasilitas_double = Double.valueOf(fasilitas_cafe);
+                        double rating_double = Double.valueOf(rating_cafe);
+
+                        //insert to array
+                        tobesorted.add(new TopsisModel(jarak_double, harga_double, suasana_double, fasilitas_double, rating_double, cipositif,Integer.valueOf(id_cafe), nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+                        Log.i("TobesortedArray", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                                "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                                "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                                "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                                "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                                "\nNilai Ci+: " + tobesorted.get(i).getTopsisborda() );
+
+                    }
+
+                    NextUserSortAndDoBorda(tobesorted);
+                    SendFinalArraylistToNextAct(borda);
+                    progressDialog.dismiss();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                    startActivity(intent);
+                    finish();
+
+
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(RecomendationPage.this);
+        requestQueue.add(stringRequest);
+    }
+
+
+    //borda for first user only
+    private void FirstUserOnlySortAndDoBorda(ArrayList<TopsisModel> array) {
+
+        Collections.sort(array, new SortForBorda());
+
+        for (int i = 0 ; i<array.size();i++){
+
+            Log.i("SortedResult", "{\nId: " + array.get(i).getId_cafe() +
+                    "\nNama: " + array.get(i).getNama_cafe() +
+                    "\njarak: " + array.get(i).getJarak_cafe() +
+                    "\nsuasana: " + array.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + array.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + array.get(i).getTopsisborda() );
+
+        }
+
+        for (int i = 0; i < array.size(); i++ ){
+
+            double getborda = array.get(i).getTopsisborda() * (i+1);
+
+            double jarak_cafe = array.get(i).getJarak_cafe();
+
+            int id_cafe = array.get(i).getId_cafe();
+
+            String nama_cafe = array.get(i).getNama_cafe();
+
+            String alamat_cafe = array.get(i).getAlamat_cafe();
+
+            double harga_cafe = array.get(i).getHarga_cafe();
+
+            double suasana_cafe = array.get(i).getSuasana_cafe();
+
+            double fasilitas_cafe = array.get(i).getFasilitas_cafe();
+
+            double rating_cafe = array.get(i).getRating_cafe();
+
+            String jam_operasional_cafe = array.get(i).getJamoperasional_cafe();
+
+            String gambar_cafe = array.get(i).getGambar_cafe();
+
+            tobesorted.set(i,new TopsisModel(jarak_cafe, harga_cafe, suasana_cafe, fasilitas_cafe, rating_cafe, getborda, id_cafe, nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+            Log.i("BordaResult", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                    "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                    "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                    "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                    "\nNilai Borda: " + tobesorted.get(i).getTopsisborda() );
+
+
+        }
+
+        Collections.sort(tobesorted, new SortByid());
+
+        for (int i = 0 ; i<tobesorted.size();i++){
+
+            Log.i("User1", "{\nId: " + tobesorted.get(i).getId_cafe() +
+                    "\nNama: " + tobesorted.get(i).getNama_cafe() +
+                    "\njarak: " + tobesorted.get(i).getJarak_cafe() +
+                    "\nsuasana: " + tobesorted.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + tobesorted.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + tobesorted.get(i).getTopsisborda() );
+
+        }
+
+    }
+
+    //borda
+    private void FirstUserSortAndDoBorda(ArrayList<TopsisModel> array) {
+
+        Collections.sort(array, new SortForBorda());
+
+        for (int i = 0 ; i<array.size();i++){
+
+            Log.i("SortedResult", "{\nId: " + array.get(i).getId_cafe() +
+                    "\nNama: " + array.get(i).getNama_cafe() +
+                    "\njarak: " + array.get(i).getJarak_cafe() +
+                    "\nsuasana: " + array.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + array.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + array.get(i).getTopsisborda() );
+
+        }
+
+        for (int i = 0; i < array.size(); i++ ){
+
+            double getborda = array.get(i).getTopsisborda() * (i+1);
+
+            double jarak_cafe = array.get(i).getJarak_cafe();
+
+            int id_cafe = array.get(i).getId_cafe();
+
+            String nama_cafe = array.get(i).getNama_cafe();
+
+            String alamat_cafe = array.get(i).getAlamat_cafe();
+
+            double harga_cafe = array.get(i).getHarga_cafe();
+
+            double suasana_cafe = array.get(i).getSuasana_cafe();
+
+            double fasilitas_cafe = array.get(i).getFasilitas_cafe();
+
+            double rating_cafe = array.get(i).getRating_cafe();
+
+            String jam_operasional_cafe = array.get(i).getJamoperasional_cafe();
+
+            String gambar_cafe = array.get(i).getGambar_cafe();
+
+            borda.add(new TopsisModel(jarak_cafe, harga_cafe, suasana_cafe, fasilitas_cafe, rating_cafe, getborda, id_cafe, nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+                Log.i("BordaResult", "{\nId: " + borda.get(i).getId_cafe() +
+                        "\nNama: " + borda.get(i).getNama_cafe() +
+                        "\njarak: " + borda.get(i).getJarak_cafe() +
+                        "\nsuasana: " + borda.get(i).getSuasana_cafe() +
+                        "\nfasilitas: " + borda.get(i).getFasilitas_cafe() +
+                        "\nNilai Borda: " + borda.get(i).getTopsisborda() );
+
+
+        }
+
+        Collections.sort(borda, new SortByid());
+
+        for (int i = 0 ; i<borda.size();i++){
+
+            Log.i("User1", "{\nId: " + borda.get(i).getId_cafe() +
+                    "\nNama: " + borda.get(i).getNama_cafe() +
+                    "\njarak: " + borda.get(i).getJarak_cafe() +
+                    "\nsuasana: " + borda.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + borda.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + borda.get(i).getTopsisborda() );
+
+        }
+
+    }
+
+    private void NextUserSortAndDoBorda(ArrayList<TopsisModel> array) {
+
+        Collections.sort(array, new SortForBorda());
+
+        for (int i = 0 ; i<array.size();i++){
+
+            Log.i("SortedResult"+counter, "{\nId: " + array.get(i).getId_cafe() +
+                    "\nNama: " + array.get(i).getNama_cafe() +
+                    "\njarak: " + array.get(i).getJarak_cafe() +
+                    "\nsuasana: " + array.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + array.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + array.get(i).getTopsisborda() );
+
+        }
+
+        for (int i = 0; i < array.size(); i++ ){
+
+            double getborda = array.get(i).getTopsisborda() * (i+1);
+
+            int id_cafe = array.get(i).getId_cafe();
+
+            double jarak_cafe = array.get(i).getJarak_cafe();
+
+            String nama_cafe = array.get(i).getNama_cafe();
+
+            String alamat_cafe = array.get(i).getAlamat_cafe();
+
+            double harga_cafe = array.get(i).getHarga_cafe();
+
+            double suasana_cafe = array.get(i).getSuasana_cafe();
+
+            double fasilitas_cafe = array.get(i).getFasilitas_cafe();
+
+            double rating_cafe = array.get(i).getRating_cafe();
+
+            String jam_operasional_cafe = array.get(i).getJamoperasional_cafe();
+
+            String gambar_cafe = array.get(i).getGambar_cafe();
+
+            array.set(i,new TopsisModel(jarak_cafe, harga_cafe, suasana_cafe, fasilitas_cafe, rating_cafe, getborda, id_cafe, nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+            Log.i("BordaResult"+counter, "{\nId: " + array.get(i).getId_cafe() +
+                    "\nNama: " + array.get(i).getNama_cafe() +
+                    "\njarak: " + array.get(i).getJarak_cafe() +
+                    "\nsuasana: " + array.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + array.get(i).getFasilitas_cafe() +
+                    "\nNilai Borda: " + array.get(i).getTopsisborda() );
+
+
+        }
+
+        Collections.sort(array, new SortByid());
+
+        for (int i = 0 ; i<borda.size();i++){
+            double sumborda = array.get(i).getTopsisborda() + borda.get(i).getTopsisborda();
+
+            int id_cafe = array.get(i).getId_cafe();
+
+            double jarak_cafe = array.get(i).getJarak_cafe();
+
+            String nama_cafe = array.get(i).getNama_cafe();
+
+            String alamat_cafe = array.get(i).getAlamat_cafe();
+
+            double harga_cafe = array.get(i).getHarga_cafe();
+
+            double suasana_cafe = array.get(i).getSuasana_cafe();
+
+            double fasilitas_cafe = array.get(i).getFasilitas_cafe();
+
+            double rating_cafe = array.get(i).getRating_cafe();
+
+            String jam_operasional_cafe = array.get(i).getJamoperasional_cafe();
+
+            String gambar_cafe = array.get(i).getGambar_cafe();
+
+            borda.set(i,new TopsisModel(jarak_cafe, harga_cafe, suasana_cafe, fasilitas_cafe, rating_cafe, sumborda, id_cafe, nama_cafe, alamat_cafe, jam_operasional_cafe, gambar_cafe));
+
+
+            Log.i("User"+counter, "{\nId: " + borda.get(i).getId_cafe() +
+                    "\nNama: " + borda.get(i).getNama_cafe() +
+                    "\njarak: " + borda.get(i).getJarak_cafe() +
+                    "\nsuasana: " + borda.get(i).getSuasana_cafe() +
+                    "\nfasilitas: " + borda.get(i).getFasilitas_cafe() +
+                    "\nNilai Ci+: " + borda.get(i).getTopsisborda() );
+
+        }
+
+    }
+
+    private void SendFinalArraylistToNextAct(ArrayList<TopsisModel> finalarray){
+
+        Intent intent = new Intent(RecomendationPage.this,TopsisBordaResultPage.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("finalarray",finalarray);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        finish();
+
+
+    }
+
+    private void ClearArrayForNextUser() {
+        //Normalisasi clear
+        Harga_Normalisasi.clear();
+        Jarak_Normalisasi .clear();
+        Rating_Normalisasi .clear();
+        Suasana_Normalisasi .clear();
+        Fasilitas_Normalisasi .clear();
+
+        //normalisasi terbobot clear
+        Jarak_normalisasi_terbobot.clear();
+        Harga_normalisasi_terbobot.clear();
+        Fasilitas_normalisasi_terbobot.clear();
+        Suasana_normalisasi_terbobot.clear();
+        Rating_normalisasi_terbobot.clear();
+
+        //Si+ clear
+       SiPositif.clear();
+
+       //Si- clear
+        SiNegatif.clear();
+
+
+        //Jumlah Si clear
+        JumlahSi.clear();
+
+        //Ci+
+        CiPositif.clear();
+
+        //Helper array clear
+        tobesorted.clear();
+
+        seekBar_jarak.setProgress(0);
+        seekBar_harga.setProgress(0);
+        seekBar_suasana.setProgress(0);
+        seekBar_fasilitas.setProgress(0);
+        seekBar_rating.setProgress(0);
+
+
+    }
+
+
+    public void getcafedatafortopsis(){
+
+        progressDialog.setTitle("Proccessing");
+        progressDialog.setMessage("Loading.....Please Wait");
+        progressDialog.show();
+        progressDialog.setCancelable(false);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url_cafedata, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    JSONObject Response = new JSONObject(response);
+
+                    JSONObject Data = new JSONObject(Response.getString("Data"));
+
+                    JSONArray data_cafe_array = Data.getJSONArray("data_cafe");
+
+                    for (int i = 0; i < data_cafe_array.length(); i++) {
+                        //get all cafe data
+                        JSONObject data_cafe_obj = data_cafe_array.getJSONObject(i);
+
+                        String id_cafe = data_cafe_obj.getString("id_cafe");
+
+                        String nama_cafe = data_cafe_obj.getString("nama_cafe");
+
+                        String alamat_cafe = data_cafe_obj.getString("alamat_cafe");
+
+                        String harga_cafe = data_cafe_obj.getString("harga_cafe");
+
+                        String suasana_cafe = data_cafe_obj.getString("suasana_cafe");
+
+                        String fasilitas_cafe = data_cafe_obj.getString("fasilitas_cafe");
+
+                        String rating_cafe = data_cafe_obj.getString("rating_cafe");
+
+                        String jam_operasional_cafe = data_cafe_obj.getString("jam_operasional_cafe");
+
+                        String latitude_cafe = data_cafe_obj.getString("latitude_cafe");
+
+                        String longitude_cafe = data_cafe_obj.getString("longitude_cafe");
+
+                        String gambar_cafe = data_cafe_obj.getString("gambar_cafe");
+
+                        //convert string harga, jarak, rating, fasilitas, suasana to double
+                        String jarak = hitungjaraktest(latitude_cafe,longitude_cafe, string_latitude,string_longitude);
+                        jarak_double = Double.valueOf(jarak);
+                        double harga_double = Double.valueOf(harga_cafe);
+                        double suasana_double = Double.valueOf(suasana_cafe);
+                        double fasilitas_double = Double.valueOf(fasilitas_cafe);
+                        double rating_double = Double.valueOf(rating_cafe);
+
+                        //insert to array
+                        Topsisitem.add(new TopsisModel(jarak_double, harga_double, suasana_double, fasilitas_double, rating_double));
+
+
+                    }
+
+                    pembagi_jarak = Math.sqrt(hitungTopsisClass.getpembagijarak(Topsisitem,pembagi_jarak));
+                    pembagi_harga = Math.sqrt(hitungTopsisClass.getpembagiharga(Topsisitem,pembagi_harga));
+                    pembagi_fasilitas = Math.sqrt(hitungTopsisClass.getpembagifasilitas(Topsisitem,pembagi_fasilitas));
+                    pembagi_suasana = Math.sqrt(hitungTopsisClass.getpembagisuasana(Topsisitem,pembagi_suasana));
+                    pembagi_rating = Math.sqrt(hitungTopsisClass.getpembagirating(Topsisitem,pembagi_rating));
+
+                    progressDialog.dismiss();
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                    startActivity(intent);
+                    finish();
+
+
+                }
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                        error.printStackTrace();
+                        progressDialog.dismiss();
+                        Toast.makeText(getApplicationContext(),"Maaf terjadi Masalah Jaringan, pastikan anda terhubung dengan internet",Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RecomendationPage.this, HomePage.class);
+                        startActivity(intent);
+                        finish();
+
+                    }
+                });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(RecomendationPage.this);
+        requestQueue.add(stringRequest);
+
+
+    }
+
+    //jarak
+    private String hitungjaraktest(String cafe_lat, String cafe_long, String user_lat, String user_long) {
+
+        double lat_cafe = Double.valueOf(cafe_lat);
+        double long_cafe = Double.valueOf(cafe_long);
+        double lat_user = Double.valueOf(user_lat);
+        double long_user = Double.valueOf(user_long);
+
+        DecimalFormat df = new DecimalFormat("#,###,##0.00");
+
+        // distance between latitudes and longitudes
+        double dLat = Math.toRadians(lat_cafe - lat_user);
+        double dLon = Math.toRadians(long_cafe - long_user);
+
+        // convert to radians
+        double lat_cafe_rad = Math.toRadians(lat_cafe);
+        double lat_user_rad = Math.toRadians(lat_user);
+
+        // apply formulae
+        double a = Math.pow(Math.sin(dLat / 2), 2) +
+                Math.pow(Math.sin(dLon / 2), 2) *
+                        Math.cos(lat_cafe_rad) *
+                        Math.cos(lat_user_rad);
+        double rad = 6371;
+        double d = 2 * rad * Math.asin(Math.sqrt(a));
+
+        String hasil = df.format(d);
+
+        return hasil;
+
+    }
+
+    //sort untuk borda
+    private class SortForBorda implements Comparator<TopsisModel>{
+
+
+        @Override
+        public int compare(TopsisModel topsisModel, TopsisModel t1) {
+
+            return Double.compare(topsisModel.getTopsisborda(),t1.getTopsisborda());
+        }
+    }
+
+    //sort id
+    private class SortByid implements Comparator<TopsisModel>{
+
+
+        @Override
+        public int compare(TopsisModel topsisModel, TopsisModel t1) {
+
+            return Integer.compare(topsisModel.getId_cafe(), t1.getId_cafe());
+        }
+    }
+
+    private void TopsisCalculation(){
+
+        //Normalisasi kriteria
+        hitungTopsisClass.HargaNormalisasi(Topsisitem, pembagi_harga,Harga_Normalisasi);
+        hitungTopsisClass.JarakNormalisasi(Topsisitem, pembagi_jarak, Jarak_Normalisasi);
+        hitungTopsisClass.FasilitasNormalisasi(Topsisitem, pembagi_fasilitas, Fasilitas_Normalisasi);
+        hitungTopsisClass.SuasanaNormalisasi(Topsisitem, pembagi_suasana, Suasana_Normalisasi);
+        hitungTopsisClass.RatingNormalisasi(Topsisitem, pembagi_rating, Rating_Normalisasi);
+
+        //normalisasi terbobot
+        hitungTopsisClass.JarakNormalisasiTerbobot(Jarak_Normalisasi,bobot_normalisasi_jarak,Jarak_normalisasi_terbobot);
+        hitungTopsisClass.HargaNormalisasiTerbobot(Harga_Normalisasi,bobot_normalisasi_harga,Harga_normalisasi_terbobot);
+        hitungTopsisClass.fasilitasNormalisasiTerbobot(Fasilitas_Normalisasi,bobot_normalisasi_fasilitas, Fasilitas_normalisasi_terbobot);
+        hitungTopsisClass.suasanaNormalisasiTerbobot(Suasana_Normalisasi, bobot_normalisasi_suasana, Suasana_normalisasi_terbobot);
+        hitungTopsisClass.ratingNormalisasiTerbobot(Rating_Normalisasi, bobot_normalisasi_rating,Rating_normalisasi_terbobot);
+
+        //A+
+        JarakPositif = Collections.min(Jarak_normalisasi_terbobot);
+        HargaPositif = Collections.min(Harga_normalisasi_terbobot);
+        SuasanaPositif = Collections.max(Suasana_normalisasi_terbobot);
+        FasilitasPostif = Collections.max(Fasilitas_normalisasi_terbobot);
+        RatingPositif = Collections.max(Rating_normalisasi_terbobot);
+
+        //A-
+        JarakNegatif = Collections.max(Jarak_normalisasi_terbobot);
+        HargaNegatif = Collections.max(Harga_normalisasi_terbobot);
+        SuasanaNegatif = Collections.min(Suasana_normalisasi_terbobot);
+        FasilitasNegatif = Collections.min(Fasilitas_normalisasi_terbobot);
+        RatingNegatif = Collections.min(Rating_normalisasi_terbobot);
+
+        //Si+
+        hitungTopsisClass.SiPositif(Jarak_normalisasi_terbobot,Harga_normalisasi_terbobot,Suasana_normalisasi_terbobot,
+                Fasilitas_normalisasi_terbobot,Rating_normalisasi_terbobot,SiPositif,JarakPositif,HargaPositif,
+                SuasanaPositif,FasilitasPostif, RatingPositif);
+
+        //Si-
+        hitungTopsisClass.SiNegatif(Jarak_normalisasi_terbobot,Harga_normalisasi_terbobot,Suasana_normalisasi_terbobot,
+                Fasilitas_normalisasi_terbobot,Rating_normalisasi_terbobot,SiNegatif,JarakNegatif,HargaNegatif,
+                SuasanaNegatif,FasilitasNegatif, RatingNegatif);
+
+        //Jumlah Si
+        hitungTopsisClass.JumlahSi(SiPositif,SiNegatif,JumlahSi);
+
+        //Ci+
+        hitungTopsisClass.CiPositif(SiNegatif,JumlahSi,CiPositif);
+
+    }
+
+    public void onBackPressed() {
+
+        final Dialog dialog = new Dialog(RecomendationPage.this);
+        dialog.setContentView(R.layout.dialog_cancel_recommendation);
+        dialog.setTitle("Batalkan Rekomendasi ?");
+        yes_cancel_recomm = dialog.findViewById(R.id.bt_yes_cancelation);
+        no_cancel_recomm = dialog.findViewById(R.id.bt_no_cancelation);
+        no_cancel_recomm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        yes_cancel_recomm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(getApplicationContext(),HomePage.class);
+                startActivity(intent);
+                finish();
+
+            }
+        });
+
+        dialog.show();
+
+    }
+
+
+
+}
+
+
+                                    Intent intent = new Intent(HomeActivity.this, BobotActivity.class);
+                                    Bundle args = new Bundle();
+                                    args.putParcelable("user_lat_lng", latLng);
+                                    intent.putExtras(args);
+                                    intent.putExtra("jumlah_pengguna", mCounter);
+                                    Log.i("JUMLAH_USER", String.valueOf(mCounter));
+                                    startActivity(intent);
+
+
+                                   Intent intent = getIntent();
+                                           LatLng latLng = intent.getParcelableExtra("user_lat_lng");
+                                           user_lat = latLng.latitude;
+                                           user_lng = latLng.longitude;
+                                           Log.i("USER_LAT", String.valueOf(user_lat));
+                                           Log.i("USER_LNG", String.valueOf(user_lng));
+
+
+Intent intent = new Intent(BobotActivity.this, MainActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("array_hasil", arrayHasil);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        finish();

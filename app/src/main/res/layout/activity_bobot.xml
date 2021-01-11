@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BobotActivity">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/title_judul_bobot"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="#EB4145"
+            android:gravity="center"
+            android:text="ATUR BOBOT KRITERIA"
+            android:textColor="@color/colorWhite"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textview_nmrPengguna"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_judul_bobot"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="36dp"
+            android:text="Pengguna ke - "
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:background="@drawable/button_white"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="3dp"
+            android:paddingTop="3dp"/>
+
+        <TextView
+            android:id="@+id/textview_harga"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_nmrPengguna"
+            android:layout_marginLeft="100dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Harga"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_harga"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_nmrPengguna"
+            android:layout_marginLeft="80dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@+id/textview_harga"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/seekbar_harga"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_harga"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:thumbTint="#E22228" />
+
+        <TextView
+            android:id="@+id/textview_jarak"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekbar_harga"
+            android:layout_marginLeft="100dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Jarak"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_jarak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekbar_harga"
+            android:layout_marginLeft="80dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@+id/textview_jarak"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/seekbar_jarak"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_jarak"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:thumbTint="#E22228" />
+
+        <TextView
+            android:id="@+id/textview_fasilitas"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekbar_jarak"
+            android:layout_marginLeft="100dp"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="Jumlah Lapangan"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/tv_fasilitas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/seekbar_jarak"
+            android:layout_marginLeft="80dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toRightOf="@+id/textview_fasilitas"
+            android:gravity="center"
+            android:text="0"
+            android:textSize="20sp" />
+
+        <SeekBar
+            android:id="@+id/seekbar_fasilitas"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textview_fasilitas"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:thumbTint="#E22228" />
+
+        <Button
+            android:id="@+id/button_konfirmasiBobot"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/seekbar_fasilitas"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/button_background"
+            android:text="Konfirmasi"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_below="@+id/button_konfirmasiBobot"
+            android:id="@+id/textview_keterangan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:text="@string/keterangan"
+            android:textSize="14sp"
+            android:background="#FFB8B9"
+            android:padding="3dp"
+            android:layout_margin="6dp"/>
+
+    </RelativeLayout>
+
+</ScrollView>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">SHUTTLE</string>
+    <string name="keterangan"> Keterangan : \nMasukan nilai bobot yang Anda inginkan menggunakan seekbar yang ada pada halaman ini.
+        \n \nHarga : Semakin besar nilai seekbar harga, berarti Anda memprioritaskan lapangan dengan harga yang lebih murah.
+        \nJarak : Semakin besar nilai seekbar jarak, berarti Anda memprioritaskan lapangan dengan jarak yang dekat dengan lokasi anda.
+        \nJumlah Lapangan : Semakin besar nilai seekbar jumlah lapangan, berarti Anda memprioritaskan lapangan dengan jumlah lapangan yang lebih banyak.
+    \n \nContoh : Jika Anda ingin mencari lapangan badminton dengan harga yang lebih murah, maka Anda akan mengisikan nilai 10 untuk harga, 2 untuk jarak, dan 1 untuk fasilitas.
+    </string>
+    <string name="rekomendasi"> Keterangan : \nHasil rekomendasi adalah pilihan lapangan badminton terbaik yang direkomendasikan oleh aplikasi SHUTTLE berdasarkan bobot kriteria yang telah Anda masukan sebelumnya.
+        \n \nLapangan nomor 1 (paling atas) adalah lapangan terbaik.
+        \nLapangan nomor 2 (tengah) adalah lapangan ke dua terbaik.
+        \nLapangan nomor 3 (paling bawah) adalah lapangan ke tiga terbaik.
+    </string>
+    <string name="judul_app"> Selamat datang di SHUTTLE </string>
+    <string name="judul_app_desc"> SHUTTLE adalah aplikasi rekomendasi lapangan badminton di kota Malang </string>
+</resources>

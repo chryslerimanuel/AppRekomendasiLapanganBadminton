@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="10dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <ImageView
+            android:id="@+id/iv_fotoLap"
+            android:src="@drawable/ic_launcher_background"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"/>
+
+        <TextView
+            android:id="@+id/tv_namaLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toRightOf="@+id/iv_fotoLap"
+            android:text="Nama Lapangan"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="2"/>
+
+        <TextView
+            android:id="@+id/tv_alamatLap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_namaLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="3dp"
+            android:layout_toRightOf="@+id/iv_fotoLap"
+            android:text="Alamat"
+            android:textSize="14sp"
+            android:maxLines="2"
+            />
+
+        <ImageView
+            android:id="@+id/iv_IconHarga"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_alamatLap"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@+id/iv_fotoLap"
+            android:src="@drawable/ic_monetization_on_black_24dp" />
+
+        <TextView
+            android:id="@+id/tv_hargaLap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_alamatLap"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@+id/iv_IconHarga"
+            android:text="Harga"
+            android:maxLines="1"
+            android:maxLength="8"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/iv_iconJarak"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_alamatLap"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@+id/tv_hargaLap"
+            android:src="@drawable/ic_location_on_black_24dp"
+             />
+
+        <TextView
+            android:id="@+id/tv_jarakLap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_alamatLap"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@+id/iv_iconJarak"
+            android:text="Jarak"
+            android:maxLines="1"
+            android:maxLength="4"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_alamatLap"
+            android:layout_marginTop="20dp"
+            android:layout_toRightOf="@+id/tv_jarakLap"
+            android:text=" km"
+            android:textSize="12sp" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

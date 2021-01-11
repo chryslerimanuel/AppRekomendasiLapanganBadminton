@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/tv_judulJumlahPengguna"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Masukan Jumlah Pengguna"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:layout_marginBottom="32dp"
+        android:layout_marginTop="20dp"/>
+
+    <TextView
+        android:id="@+id/tv_jumlahPengguna"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/tv_judulJumlahPengguna"
+        android:textSize="36sp"
+        android:gravity="center"
+        />
+
+    <Button
+        android:id="@+id/button_tambah"
+        android:layout_toRightOf="@+id/tv_jumlahPengguna"
+        android:layout_below="@+id/tv_judulJumlahPengguna"
+        android:layout_marginTop="10dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:text="+"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/button_kurang"
+        android:layout_toLeftOf="@+id/tv_jumlahPengguna"
+        android:layout_below="@+id/tv_judulJumlahPengguna"
+        android:layout_marginTop="10dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:text="-"
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/button_konfirmasiJumlah"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_jumlahPengguna"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"
+        android:text="Konfirmasi"
+        android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button"
+        android:background="@drawable/button_background"
+        android:textColor="@color/colorWhite"/>
+
+</RelativeLayout>
